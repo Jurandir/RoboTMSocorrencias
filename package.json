@@ -1,0 +1,21 @@
+{
+  "name": "botocorrencias",
+  "version": "1.0.0",
+  "description": "Micro-Serviço: Coleta de Dados de Ocorrências e envias para API´s Clientes",
+  "main": "webhook.js",
+  "scripts": {
+    "run": "node .",
+    "start": "npx nodemon .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Jurandir Ferreira",
+  "license": "ISC",
+  "dependencies": {
+    "colors": "^1.4.0",
+    "dotenv": "^8.2.0",
+    "mssql": "^6.2.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  }
+}
