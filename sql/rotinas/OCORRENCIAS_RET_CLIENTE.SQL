@@ -1,0 +1,9 @@
+UPDATE SIC.dbo.OCORRENCIAS
+SET RET_MENSAGEM  = '',
+    RET_PROTOCOLO = '',
+    RET_SUCESSO   = 0
+    DT_ENVIO = CURRENT_TIMESTAMP
+WHERE 
+    ID = -1
+        
+

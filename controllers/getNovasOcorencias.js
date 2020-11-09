@@ -7,9 +7,7 @@ var sqlOcorencias = fs.readFileSync(sqlFileName, "utf8");
 
 async function getNovasOcorencias() {    
     let dados         = {}
-
-    console.log('Lendos dados...')
-   
+  
     try {
         data = await sqlQuery(sqlOcorencias)
   
