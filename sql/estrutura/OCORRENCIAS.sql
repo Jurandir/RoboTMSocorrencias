@@ -30,4 +30,9 @@ CREATE TABLE OCORRENCIAS (
   OUN_CHAVE         VARCHAR(20)    NOT NULL,
   OUN_DATE          DATETIME       NOT NULL,
   OUN_CODIGO        INT            NOT NULL,
+  QTD_REENVIO       INT            DEFAULT 0
 );
+
+---- 10/11/2020 -- Controle de reenvios
+ALTER TABLE SIC.dbo.OCORRENCIAS 
+ADD QTD_REENVIO INT DEFAULT 0;

@@ -3,7 +3,7 @@ const formataDataBD            = require('../utils/formataDataBD')
 const selectChaveValidaCliente = require('../utils/selectChaveValidaCliente')
 
 const enviaOcorrencia = async ( ocorrencia, cliente ) => {
-
+    let ret
     const url = cliente.SERVIDOR + cliente.URL_OCORRENCIA
     const config = {
       headers: { "Content-Type": 'application/json' }
@@ -22,12 +22,11 @@ const enviaOcorrencia = async ( ocorrencia, cliente ) => {
         "observacao": ocorrencia.OBSERVACAO
       }
       try {       
-        let ret = await axios.post(url,  bodyParameters, config)
-          return { dados : ret.data, isErr: false}
+          ret = await axios.post(url,  bodyParameters, config)
+          return { dados : ret.data, isErr: false, isAxiosError: ret.isAxiosError }
       } catch (err) { 
-          return {err, isErr: true, url: url };
+          return {err, isErr: true, url: url, isAxiosError: true }
       }
-    
 }
 
 module.exports = enviaOcorrencia

@@ -4,6 +4,7 @@ async function sqlQuery( sSQL ) {
     try {  
         let pool = await poolPromise 
         let result = await pool.request().query( sSQL )
+        pool.close
         return result.recordset
     } catch (err) {  
         return ( { "Erro" : err.message } )
