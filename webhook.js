@@ -2,16 +2,17 @@ const colors = require('colors')
 
 require('dotenv').config()
 
-const displayDados                 = require('./utils/displayDados')
-const enviaOcorrencia              = require('./controllers/enviaOcorrencia')
-const getNovasOcorencias           = require('./controllers/getNovasOcorencias')
-const checkNovasOcorencias         = require('./controllers/checkNovasOcorencias')
-const checkNovasOcorenciasIniciais = require('./controllers/checkNovasOcorenciasIniciais')
-const getOcorenciasNaoEnviadas     = require('./controllers/getOcorenciasNaoEnviadas')
-const getCliente                   = require('./controllers/getCliente')
-const gravaRetornoCliente          = require('./controllers/gravaRetornoCliente')
-const reenvioDeOcorencias          = require('./controllers/reenvioDeOcorencias')
-const sendLog                      = require('./utils/sendLog')
+const displayDados                  = require('./utils/displayDados')
+const enviaOcorrencia               = require('./controllers/enviaOcorrencia')
+const getNovasOcorencias            = require('./controllers/getNovasOcorencias')
+const checkNovasOcorencias          = require('./controllers/checkNovasOcorencias')
+const checkNovasOcorenciasIniciais  = require('./controllers/checkNovasOcorenciasIniciais')
+const checkNovasOcorenciasManifesto = require('./controllers/checkNovasOcorenciasManifesto')
+const getOcorenciasNaoEnviadas      = require('./controllers/getOcorenciasNaoEnviadas')
+const getCliente                    = require('./controllers/getCliente')
+const gravaRetornoCliente           = require('./controllers/gravaRetornoCliente')
+const reenvioDeOcorencias           = require('./controllers/reenvioDeOcorencias')
+const sendLog                       = require('./utils/sendLog')
 
 // Tempo em mseg para loop de checagem
 const check_time                 = process.env.CHECK_TIME || 5000
@@ -106,6 +107,11 @@ let enviaDados = async () => {
 let chacaNovasOcorencias = setInterval(() => {
   checks++
   ShowInfo()
+
+  // Checa se há novos manifestos (SAÍDA NO CENTRO DE DISTRIBUIÇÃO (CDOUT))
+  checkNovasOcorenciasManifesto().then((dados)=>{
+    inseridos += dados.rowsAffected 
+  })
 
   // Checa se há novos conhecimentos (PROCESSO DE TRANSPORTE INICIADO)
   checkNovasOcorenciasIniciais().then((dados)=>{

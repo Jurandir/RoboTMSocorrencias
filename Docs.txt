@@ -1,14 +1,10 @@
-
-
 ** 03/11/2020
-
 (douglas.rosario.barbosa@cevalogistics.com) 
 Obs. O sistema só aceita CT´es que estejam no ambiente de teste.
 
 Chave Acesso
 35200743854116006484570000007681611124057857
 35200743854116006484570000007681621124629793
-
 
 ** 10/11/2020
 Procedimento CEVA
@@ -18,7 +14,7 @@ Emissão de conhecimento gravar ocorrência "0- PROCESSO DE TRANSPORTE INICIADO"
 Ocorrência Casual - 15
 Ocorrência de Transporte - "43 ENTROU NO XD DO TRANSPORTADOR"
 
-Emissão de manifesto - gravar ocorrência "302 -Saída no Centro de Distribuição (CDOUT)"
+Emissão de manifesto - gravar ocorrência "302 -SAÍDA NO CENTRO DE DISTRIBUIÇÃO (CDOUT)"
 Ocorrência Casual - 15
 Ocorrência de Transporte - "89 SAIDA DO HUB" - se possível gravar filial de movimentação na observação de ocorrências exemplo: Filial emissão do manifesto (São Paulo ou SPO) somente para identificar aonde ocorreu o evento devido a possível transbordo.
 
@@ -26,3 +22,8 @@ Baixa de manifesto gravar ocorrências "98-CHEGADA NA CIDADE OU FILIAL DE DESTIN
 Ocorrência Casual - 15
 Ocorrência de Transporte - "88 CHEGADA NO HUB 98" -  se possível gravar filial de movimentação na observação de ocorrências exemplo: Filial baixa do manifesto (Fortaleza ou FOR) somente para identificar aonde ocorreu o evento devido a possível transbordo.
 
+DADOS:
+select * from CARGASSQL.dbo.MNF  -- CHEGADA / statusbaixa
+select * from CARGASSQL.dbo.TRB -- LINK ( Conhecimento X Manifesto )
+
+-- ver possibilidade de EXISTS na view para identificar se INIT foi lançado ( TESTAR )
