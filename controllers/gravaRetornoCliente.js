@@ -1,4 +1,6 @@
 const sqlExec       = require('../connection/sqlExec')
+const sendLog       = require('../utils/sendLog')
+
 
 async function gravaRetornoCliente(ocorrencia, retorno) {    
     let dados = {}
@@ -24,6 +26,7 @@ async function gravaRetornoCliente(ocorrencia, retorno) {
   
     } catch (err) {
         dados = { "erro" : err.message, "rotina" : "gravaRetornoCliente", "sql" : sql,"retorno": retorno }
+        sendLog('ERRO',dados)
         return dados
     } 
 }

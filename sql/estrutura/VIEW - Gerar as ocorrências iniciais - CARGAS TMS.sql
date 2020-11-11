@@ -37,6 +37,7 @@ AS
 	CAST(NULL AS DATETIME)                  as OUN_DATE,
 	0                                       as OUN_CODIGO
 FROM CARGASSQL.dbo.CNH
+    JOIN CONHECIMENTO CON                ON CON.DOCUMENTO      = CONCAT(CNH.EMP_CODIGO,SERIE,CTRC)
     JOIN CARGASSQL.dbo.CTE               ON CTE.EMP_CODIGO_CNH = CNH.EMP_CODIGO	AND 
 	                                        CTE.CNH_SERIE      = CNH.SERIE	AND 
 											CTE.CNH_CTRC       = CNH.CTRC											

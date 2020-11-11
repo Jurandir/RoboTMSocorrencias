@@ -1,4 +1,6 @@
 const sqlQuery      = require('../connection/sqlQuery')
+const sendLog       = require('../utils/sendLog')
+
 const fs            = require('fs')
 const path          = require('path')
 const sqlFileName   =  path.join(__dirname, '../sql/consultas/NOVAS_OCORRENCIAS.SQL');
@@ -23,6 +25,7 @@ async function getNovasOcorencias() {
   
     } catch (err) {
         dados = { "erro" : err.message, "rotina" : "getNovasOcorencias", "sql" : sqlOcorencias }
+        sendLog('ERRO',dados)
         return dados
     } 
 }

@@ -5,6 +5,7 @@ require('dotenv').config()
 const displayDados                  = require('./utils/displayDados')
 const enviaOcorrencia               = require('./controllers/enviaOcorrencia')
 const getNovasOcorencias            = require('./controllers/getNovasOcorencias')
+const checkNovosConhecimentos       = require('./controllers/checkNovosConhecimentos')
 const checkNovasOcorencias          = require('./controllers/checkNovasOcorencias')
 const checkNovasOcorenciasIniciais  = require('./controllers/checkNovasOcorenciasIniciais')
 const checkNovasOcorenciasManifesto = require('./controllers/checkNovasOcorenciasManifesto')
@@ -21,24 +22,25 @@ const check_time                 = process.env.CHECK_TIME || 5000
 process.stdout.write('\x1B[2J\x1B[0f')
 const titulo = '[BOT Ocorrências:]'.yellow.bgBlue.bold
 console.log(titulo)
-sendLog('INFO','Startup serviço')
+sendLog('MSG','Startup serviço')
 
 // Ler parametros de SETUP da API do Cliente
 let cliente 
 getCliente().then((dados)=>{
    cliente = dados[0]
    console.log('Cliente Ativo:',cliente.CNPJ_CLI)
-   sendLog('INFO',`Setup cliente ${cliente.CNPJ_CLI}`)
+   sendLog('AVISO',`Setup cliente ${cliente.CNPJ_CLI}`)
 })
 
 // Contadores
-let inseridos   = 0
-let err_prep    = 0
-let naoEnviadas = 0
-let reenvios    = 0
-let enviadas    = 0
-let recusadas   = 0
-let checks      = 0
+let conhecimentos = 0
+let inseridos     = 0
+let err_prep      = 0
+let naoEnviadas   = 0
+let reenvios      = 0
+let enviadas      = 0
+let recusadas     = 0
+let checks        = 0
 
 // Mostra estatistica no console 
 let ShowInfo = () => {
@@ -54,6 +56,7 @@ let enviaDados = async () => {
       let ret
       let ocorrencia_id = element.ID
       let retorno = { Sucesso:false, Mensagem:'Falha ao acessar API', Protocolo: 'S/N'  }
+      let str_ref = 'AVISO'
 
         try {
               // envia ocorrencia para API do cliente              
@@ -63,23 +66,29 @@ let enviaDados = async () => {
                   retorno.Sucesso   = false
                   retorno.Mensagem  = 'Sem retorno da API'
                   retorno.Protocolo = 'ERRO API'
+                  str_ref = 'ERROAPI'
               } else {
-                  retorno = ret.dados.BaixaOcorrenciaResult
+                retorno = ret.dados.BaixaOcorrenciaResult
+                str_ref = 'MSG'
               }
                           
               if (ret.isErr==true) {  // Ocoreu um erro consumindo a API
+                  str_ref = 'ERRO'
                   err_prep++  
               } else        
                 if (retorno.Sucesso==false) { // A API informou erro nos dados de envio
+                  str_ref = 'AVISOAPI'
                   recusadas++
               } else 
                 if (retorno.Sucesso==true) { // A API informou sucesso no envio
+                  str_ref = 'SUCESSO'
                   enviadas++
               } else {
+                  str_ref = 'ALERTA'
                   err_prep++ // Erro ainda não tratado
               }
 
-              sendLog('AVISO',`Ocorr ID: ${element.ID} - Ret API: ${retorno.Mensagem} - Prot: ${retorno.Protocolo}`)
+              sendLog(str_ref,`Ocorr ID: ${element.ID} - Ret API: ${retorno.Mensagem} - Prot: ${retorno.Protocolo}`)
 
               // Grava retorno recebido, na base SIC, vindo da API do Cliente
               gravaRetornoCliente(element,retorno).then((resposta)=>{
@@ -88,6 +97,7 @@ let enviaDados = async () => {
                     sendLog('ERRO',`Gravando retorno API em BD (ID.${ocorrencia_id}) : ${resposta}`)
 
                 } else {
+                  sendLog('INFO',`OK - (ID.${ocorrencia_id}) : ${resposta}`)
                   naoEnviadas--
                 }
               })
@@ -108,12 +118,17 @@ let chacaNovasOcorencias = setInterval(() => {
   checks++
   ShowInfo()
 
+  // Checa se há novos conhecimentos
+  checkNovosConhecimentos().then((dados)=>{
+      conhecimentos += dados.rowsAffected 
+  })
+
   // Checa se há novos manifestos (SAÍDA NO CENTRO DE DISTRIBUIÇÃO (CDOUT))
   checkNovasOcorenciasManifesto().then((dados)=>{
     inseridos += dados.rowsAffected 
   })
 
-  // Checa se há novos conhecimentos (PROCESSO DE TRANSPORTE INICIADO)
+  // Checa se há novos conhecimentos iniciados ( Ocorrencia : PROCESSO DE TRANSPORTE INICIADO )
   checkNovasOcorenciasIniciais().then((dados)=>{
     inseridos += dados.rowsAffected 
   })

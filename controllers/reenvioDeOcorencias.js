@@ -1,4 +1,6 @@
 const sqlExec       = require('../connection/sqlExec')
+const sendLog       = require('../utils/sendLog')
+
 const fs            = require('fs')
 const path          = require('path')
 const sqlFileName   =  path.join(__dirname, '../sql/rotinas/OCORRENCIAS_REENVIO_UPD.sql');
@@ -19,6 +21,7 @@ async function reenvioDeOcorencias() {
   
     } catch (err) {
         dados = { "erro" : err.message, "rotina" : "reenvioDeOcorencias", "sql" : sqlReEnvio }
+        sendLog('ERRO',dados)
         return dados
     } 
 }

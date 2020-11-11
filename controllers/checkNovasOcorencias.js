@@ -1,4 +1,6 @@
 const sqlExec       = require('../connection/sqlExec')
+const sendLog       = require('../utils/sendLog')
+
 const fs            = require('fs')
 const path          = require('path')
 const sqlFileName   =  path.join(__dirname, '../sql/rotinas/OCORRENCIAS_JOB_INSERT.SQL');
@@ -19,6 +21,7 @@ async function checkNovasOcorencias() {
   
     } catch (err) {
         dados = { "erro" : err.message, "rotina" : "checkNovasOcorencias", "sql" : sqlCheck }
+        sendLog('ERRO',dados)
         return dados
     } 
 }

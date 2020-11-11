@@ -5,7 +5,7 @@
 USE [SIC]
 GO
 
-CREATE VIEW OCORRENCIAS_MANIFESTO_VW
+ALTER VIEW OCORRENCIAS_MANIFESTO_VW
 AS  
  SELECT   
 	CNH.%%physloc%%                           as ID,
@@ -36,6 +36,7 @@ AS
 	CAST(NULL AS DATETIME)                    as OUN_DATE,
 	302                                       as OUN_CODIGO
 FROM CARGASSQL.dbo.CNH
+    JOIN CONHECIMENTO CON                ON CON.DOCUMENTO      = CONCAT(CNH.EMP_CODIGO,SERIE,CTRC)
     JOIN CARGASSQL.dbo.CTE               ON CTE.EMP_CODIGO_CNH = CNH.EMP_CODIGO	AND 
 	                                        CTE.CNH_SERIE      = CNH.SERIE	AND 
 											CTE.CNH_CTRC       = CNH.CTRC											
