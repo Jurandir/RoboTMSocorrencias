@@ -184,3 +184,11 @@ let chacaNovasOcorencias = setInterval(() => {
 
 /// *** PENDENCIAS ***
 /// - Rotina para leitura e envio de imagens da EasyDOC ou da Agile
+////// - Easydocs : 1-criar campo em CONHECIMENTO para STATUS do envio da imagem
+////// - Easydocs : 2-realizar laco em CONHECIMENTO com imagem não enviadas
+////// - Easydocs : 3-Fazer nova tentativa a cada 30 ninutos se não sucesso
+////// - Easydocs : 4-tentar por 7 dias
+
+
+
+
