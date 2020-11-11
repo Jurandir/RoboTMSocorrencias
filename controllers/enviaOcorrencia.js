@@ -29,7 +29,7 @@ const enviaOcorrencia = async ( ocorrencia, cliente ) => {
           return { dados : ret.data, isErr: false, isAxiosError: ret.isAxiosError }
       } catch (err) { 
           dados = {err, isErr: true, url: url, isAxiosError: true } 
-          sendLog('ERRO',dados)
+          sendLog('ERRO', JSON.stringify(dados) )
           return dados
       }
 }

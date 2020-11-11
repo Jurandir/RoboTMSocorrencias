@@ -1,6 +1,8 @@
 const fs = require('fs')
 
-const msg_info = process.env.MSG_INFO || 'TRUE'
+const msg_info    = process.env.MSG_INFO || 'TRUE'
+const msg_sucesso = process.env.MSG_SUCESSO || 'TRUE'
+const msg_aviso   = process.env.MSG_AVISO || 'TRUE'
 
 const sendLog = async ( ref, msg ) => {
     let loga = true
@@ -9,7 +11,9 @@ const sendLog = async ( ref, msg ) => {
     let file = './log/log'+hoje+'.log'
     let linha = `${agora} - ${ref} - ${msg}`+'\n'
 
-    if ((msg_info == 'FALSE') && (ref=='INFO')) { loga = false }
+    if ((msg_info    == 'FALSE') && (ref=='INFO'))    { loga = false }
+    if ((msg_sucesso == 'FALSE') && (ref=='SUCESSO')) { loga = false }
+    if ((msg_aviso   == 'FALSE') && (ref=='AVISO'))   { loga = false }
 
     if (loga==true) {
         fs.writeFile(file, linha,  {'flag':'a'},  function(err) {

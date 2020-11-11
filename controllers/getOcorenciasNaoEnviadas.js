@@ -25,7 +25,7 @@ async function getOcorenciasNaoEnviadas() {
   
     } catch (err) {
         dados = { "erro" : err.message, "rotina" : "getNovasOcorencias", "sql" : sqlNaoEnviadas }
-        sendLog('ERRO',dados)
+        sendLog('ERRO', JSON.stringify(dados) )
         return dados
     } 
 }

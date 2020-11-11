@@ -26,4 +26,3 @@ DADOS:
 select * from CARGASSQL.dbo.MNF  -- CHEGADA / statusbaixa
 select * from CARGASSQL.dbo.TRB -- LINK ( Conhecimento X Manifesto )
 
--- ver possibilidade de EXISTS na view para identificar se INIT foi lançado ( TESTAR )

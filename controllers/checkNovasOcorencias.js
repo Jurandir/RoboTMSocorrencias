@@ -21,7 +21,8 @@ async function checkNovasOcorencias() {
   
     } catch (err) {
         dados = { "erro" : err.message, "rotina" : "checkNovasOcorencias", "sql" : sqlCheck }
-        sendLog('ERRO',dados)
+        sendLog('ERRO', JSON.stringify(dados) )
+
         return dados
     } 
 }

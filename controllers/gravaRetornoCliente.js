@@ -26,7 +26,7 @@ async function gravaRetornoCliente(ocorrencia, retorno) {
   
     } catch (err) {
         dados = { "erro" : err.message, "rotina" : "gravaRetornoCliente", "sql" : sql,"retorno": retorno }
-        sendLog('ERRO',dados)
+        sendLog('ERRO', JSON.stringify(dados) )
         return dados
     } 
 }

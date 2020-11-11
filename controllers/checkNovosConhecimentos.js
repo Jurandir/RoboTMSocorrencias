@@ -21,7 +21,7 @@ async function checkNovosConhecimentos() {
   
     } catch (err) {
         dados = { "erro" : err.message, "rotina" : "checkNovosConhecimentos", "sql" : sqlCheck3 }
-        sendLog('ERRO',dados)
+        sendLog('ERRO', JSON.stringify(dados) )
         return dados
     } 
 }

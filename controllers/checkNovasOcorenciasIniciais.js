@@ -21,7 +21,7 @@ async function checkNovasOcorenciasIniciais() {
   
     } catch (err) {
         dados = { "erro" : err.message, "rotina" : "checkNovasOcorenciasIniciais", "sql" : sqlCheck1 }
-        sendLog('ERRO',dados)
+        sendLog('ERRO', JSON.stringify(dados) )
         return dados
     } 
 }

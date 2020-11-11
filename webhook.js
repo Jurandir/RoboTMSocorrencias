@@ -7,6 +7,7 @@ const enviaOcorrencia               = require('./controllers/enviaOcorrencia')
 const getNovasOcorencias            = require('./controllers/getNovasOcorencias')
 const checkNovosConhecimentos       = require('./controllers/checkNovosConhecimentos')
 const checkNovasOcorencias          = require('./controllers/checkNovasOcorencias')
+const checkBaixaManifesto           = require('./controllers/checkBaixaManifesto')
 const checkNovasOcorenciasIniciais  = require('./controllers/checkNovasOcorenciasIniciais')
 const checkNovasOcorenciasManifesto = require('./controllers/checkNovasOcorenciasManifesto')
 const getOcorenciasNaoEnviadas      = require('./controllers/getOcorenciasNaoEnviadas')
@@ -33,14 +34,15 @@ getCliente().then((dados)=>{
 })
 
 // Contadores
-let conhecimentos = 0
-let inseridos     = 0
-let err_prep      = 0
-let naoEnviadas   = 0
-let reenvios      = 0
-let enviadas      = 0
-let recusadas     = 0
-let checks        = 0
+let conhecimentos  = 0
+let baixaManifesto = 0
+let inseridos      = 0
+let err_prep       = 0
+let naoEnviadas    = 0
+let reenvios       = 0
+let enviadas       = 0
+let recusadas      = 0
+let checks         = 0
 
 // Mostra estatistica no console 
 let ShowInfo = () => {
@@ -118,51 +120,67 @@ let chacaNovasOcorencias = setInterval(() => {
   checks++
   ShowInfo()
 
+ // Baixa manifesto ( CHEGADA NA CIDADE OU FILIAL DE DESTINO ) 
+  checkBaixaManifesto().then((dados)=>{
+      baixaManifesto += dados.rowsAffected 
+      if (dados.rowsAffected > 0) {
+        sendLog('AVISO',`Baixa de Manifesto - (QTDE: ${dados.rowsAffected}, TOTAL: ${baixaManifesto})`)
+      }
+  })
+
   // Checa se há novos conhecimentos
   checkNovosConhecimentos().then((dados)=>{
       conhecimentos += dados.rowsAffected 
+      if (dados.rowsAffected > 0) {
+        sendLog('AVISO',`Conhecimentos - (QTDE: ${dados.rowsAffected}, TOTAL: ${conhecimentos})`)
+      }
   })
 
   // Checa se há novos manifestos (SAÍDA NO CENTRO DE DISTRIBUIÇÃO (CDOUT))
   checkNovasOcorenciasManifesto().then((dados)=>{
-    inseridos += dados.rowsAffected 
+      inseridos += dados.rowsAffected 
+      if (dados.rowsAffected > 0) {
+        sendLog('AVISO',`Novas Ocorrências - (QTDE: ${dados.rowsAffected}, TOTAL: ${inseridos})`)
+      }
   })
 
   // Checa se há novos conhecimentos iniciados ( Ocorrencia : PROCESSO DE TRANSPORTE INICIADO )
   checkNovasOcorenciasIniciais().then((dados)=>{
-    inseridos += dados.rowsAffected 
+      inseridos += dados.rowsAffected 
+      if (dados.rowsAffected > 0) {
+        sendLog('AVISO',`Conhecimentos Iniciados - (QTDE: ${dados.rowsAffected}, TOTAL: ${inseridos})`)
+      }
   })
   
   // Checa se há novas ocorrencias no GARGAS
   checkNovasOcorencias().then((dados)=>{
-    inseridos += dados.rowsAffected 
+      inseridos += dados.rowsAffected 
+      if (dados.rowsAffected > 0) {
+        sendLog('AVISO',`Novas Ocorrências - (QTDE: ${dados.rowsAffected}, TOTAL: ${inseridos})`)
+      }
   })
 
   // Checa existe ocorrencias não enviadas na base SIC
   getNovasOcorencias().then((dados)=>{
-    naoEnviadas = dados[0].QTDE
-    ShowInfo()
-    if (naoEnviadas > 0) { // Chama processo de envio de dados quando existe dados não enviados
-      enviaDados()
-    }
+      naoEnviadas = dados[0].QTDE
+      ShowInfo()
+      if (naoEnviadas > 0) { 
+          // Chama processo de envio de dados quando existe dados não enviados
+          enviaDados()
+      }
   })
 
   // Checa e revalida reenvios
   if (naoEnviadas == 0) {
-    reenvioDeOcorencias().then((dados)=>{
-      reenvios += dados.rowsAffected 
-    }) 
+      reenvioDeOcorencias().then((dados)=>{
+          reenvios += dados.rowsAffected 
+          if (dados.rowsAffected > 0) {
+            sendLog('AVISO',`Ocorrências ReEnviadas- (QTDE: ${dados.rowsAffected}, TOTAL: ${reenvios})`)
+          }
+      }) 
   }
 }, check_time )
 
-// Para a checagem após 90 segundos (Finaliza Programa)
-//setTimeout(() => {
-//  clearInterval(chacaNovasOcorencias)
-//  console.log(' - FIM - ')
-//
-//}, 90000)
-
 
 /// *** PENDENCIAS ***
-/// - Rotina para gerar ocorrencia quando gerado um manifesto de um conhecimento do cliente
 /// - Rotina para leitura e envio de imagens da EasyDOC ou da Agile

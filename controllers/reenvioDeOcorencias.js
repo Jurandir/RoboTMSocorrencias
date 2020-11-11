@@ -21,7 +21,7 @@ async function reenvioDeOcorencias() {
   
     } catch (err) {
         dados = { "erro" : err.message, "rotina" : "reenvioDeOcorencias", "sql" : sqlReEnvio }
-        sendLog('ERRO',dados)
+        sendLog('ERRO', JSON.stringify(dados) )
         return dados
     } 
 }
