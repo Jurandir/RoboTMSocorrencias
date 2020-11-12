@@ -7,6 +7,7 @@ const enviaOcorrencia               = require('./controllers/enviaOcorrencia')
 const getNovasOcorencias            = require('./controllers/getNovasOcorencias')
 const checkNovosConhecimentos       = require('./controllers/checkNovosConhecimentos')
 const checkNovasOcorencias          = require('./controllers/checkNovasOcorencias')
+const checkNovasEvidencias          = require('./controllers/checkNovasEvidencias')
 const checkBaixaManifesto           = require('./controllers/checkBaixaManifesto')
 const checkNovasOcorenciasIniciais  = require('./controllers/checkNovasOcorenciasIniciais')
 const checkNovasOcorenciasManifesto = require('./controllers/checkNovasOcorenciasManifesto')
@@ -17,7 +18,8 @@ const reenvioDeOcorencias           = require('./controllers/reenvioDeOcorencias
 const sendLog                       = require('./utils/sendLog')
 
 // Tempo em mseg para loop de checagem
-const check_time                 = process.env.CHECK_TIME || 5000
+const check_time                 = process.env.CHECK_TIME      || 10000
+const time_evidencias            = process.env.TIME_EVIDENCIAS || 1800000
 
 // Tela inicial
 process.stdout.write('\x1B[2J\x1B[0f')
@@ -34,15 +36,17 @@ getCliente().then((dados)=>{
 })
 
 // Contadores
-let conhecimentos  = 0
-let baixaManifesto = 0
-let inseridos      = 0
-let err_prep       = 0
-let naoEnviadas    = 0
-let reenvios       = 0
-let enviadas       = 0
-let recusadas      = 0
-let checks         = 0
+let conhecimentos    = 0
+let baixaManifesto   = 0
+let inseridos        = 0
+let err_prep         = 0
+let naoEnviadas      = 0
+let reenvios         = 0
+let enviadas         = 0
+let recusadas        = 0
+let checks           = 0
+let load_evidencias  = 0
+let check_evidencias = 0
 
 // Mostra estatistica no console 
 let ShowInfo = () => {
@@ -115,7 +119,7 @@ let enviaDados = async () => {
   })
 }
 
-// Checa novas ocorrências a cada 5 segundos
+// Checa novas ocorrências a cada ($check_time$)
 let chacaNovasOcorencias = setInterval(() => {
   checks++
   ShowInfo()
@@ -180,6 +184,38 @@ let chacaNovasOcorencias = setInterval(() => {
       }) 
   }
 }, check_time )
+
+
+// Checa novas evidências a cada ($time_evidencias$)
+let  loopEvidencias = setInterval(() => {
+  load_evidencias++
+  sendLog('INFO',`Check novas evidências - (QTDE: ${load_evidencias}, INTERNALO: ${time_evidencias})`)
+
+  // 
+  checkNovasEvidencias().then((dados)=>{
+    check_evidencias += dados.rowsAffected 
+    ShowInfo()
+  })
+
+}, time_evidencias )
+
+
+/// teste
+checkNovasEvidencias().then((ret)=>{
+    check_evidencias += ret.rowsAffected 
+    //let rowsAffected  = ret.rowsAffected
+    //let qtdeSucesso   = ret.qtdeSucesso
+    //sendLog('INFO',`Documentos - ( REQUISITADOS: ${rowsAffected}, RETORNADOS: ${qtdeSucesso})`)
+    ShowInfo()   
+})
+
+
+
+//--- envia para SEVA/CLIENTE
+//--- retorna SUCESSO ou FALHA
+
+
+
 
 
 /// *** PENDENCIAS ***

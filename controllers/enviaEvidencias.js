@@ -3,19 +3,19 @@ const sendLog       = require('../utils/sendLog')
 
 const selectChaveValidaCliente = require('../utils/selectChaveValidaCliente')
 
-const enviaEvidencias = async ( ocorrencia, cliente, imagem ) => {
+const enviaEvidencias = async ( evidencia, imagem ) => {
     let ret
     let dados
-    const url = cliente.SERVIDOR + cliente.URL_EVIDENCIAR_OCORRENCIA
+    const url = evidencia.SERVIDOR + evidencia.URL_EVIDENCIAR_OCORRENCIA
     const config = {
       headers: { "Content-Type": 'application/json' }
       }
   
     let bodyParameters = {
-        "login": cliente.LOGIN,
-        "senha": cliente.SENHA,
-        "chave": selectChaveValidaCliente( ocorrencia.CHAVEORIGINAL ),
-        "tipoImagem": ocorrencia.TIPOIMAGEM,
+        "login": evidencia.LOGIN,
+        "senha": evidencia.SENHA,
+        "chave": selectChaveValidaCliente( `${evidencia.CHAVEORIGINAL}` ),
+        "tipoImagem": evidencia.TIPOIMAGEM,
         "imagem": imagem,
         "replicar": "",
       }

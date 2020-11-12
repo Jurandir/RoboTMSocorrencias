@@ -6,11 +6,9 @@ const checkImagemEasyDocs = async (documento) => {
     let base64Str = { ok:false, msg:'Sem retorno',imagem:''}
 
     let empresa = value.substring(0,3)
-    let ctrc    = value.substring(3,10)
+    let ctrc    = value.substring(4,10)
 
-    sendLog('AVISO',`Solicitando imagem ${documento}, Aguardando EasyDocs...`)
-
-    console.log(empresa,ctrc)
+    sendLog('INFO',`Solicitando imagem ${documento}, Aguardando EasyDocs...`)
 
     await getImageEasydocs(empresa,ctrc ).then((resposta)=>{
 
