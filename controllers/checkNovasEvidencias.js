@@ -1,13 +1,34 @@
-const getEvidencias   = require('./getEvidencias')
-const sendLog         = require('../utils/sendLog')
-const easydocs        = require('../controllers/checkImagemEasyDocs')
-const enviaEvidencias = require('../controllers/enviaEvidencias')
-
+const getEvidencias           = require('./getEvidencias')
+const gravaRegistroEvidencias = require('./gravaRegistroEvidencias')
+const sendLog                 = require('../utils/sendLog')
+const easydocs                = require('../controllers/checkImagemEasyDocs')
+const enviaEvidencias         = require('../controllers/enviaEvidencias')
 
 async function checkNovasEvidencias() {  
     let ret   = { rowsAffected: 0, qtdeSucesso: 0,msg: '', isErr: false  }   
     let dados = await getEvidencias()
     let ultimo_doc
+
+    function gravaEvidenciasLoad_OK(documento){
+        let params = {
+            documento: documento,
+            enviado: 0,
+            origem: 'EASYDOCS',
+            load: 1,
+            send: 0,
+        }
+        gravaRegistroEvidencias(params)
+    }
+    function gravaEvidenciasSend_OK(documento){
+        let params = {
+            documento: documento,
+            enviado: 1,
+            origem: 'EASYDOCS',
+            load: 1,
+            send: 0,
+        }
+        gravaRegistroEvidencias(params)
+    }
     
     if (dados.erro) {
         ret.isErr = true
@@ -30,6 +51,7 @@ async function checkNovasEvidencias() {
                 isErr        = resposta.isErr
                 isAxiosError = resposta.isAxiosError || false
                 resultado    = resposta.dados.EvidenciaOcorrenciaResult
+                gravaEvidenciasLoad_OK(element.DOCUMENTO)
             } catch (err) {
                 isErr = true
                 sendLog('WARNING',`Envio para API -DOC:${element.DOCUMENTO} - (Sem Resposta)` )
@@ -40,16 +62,13 @@ async function checkNovasEvidencias() {
             } else if ( resultado.Sucesso == false ) { 
                 sendLog('WARNING',`Envio p/ API - DOC: ${element.DOCUMENTO} - Ret API: ${resultado.Mensagem} - Prot: ${resultado.Protocolo}`)
             } else if ( resultado.Sucesso == true ) { 
+                gravaEvidenciasSend_OK(element.DOCUMENTO)
                 sendLog('SUCESSO',`Envio p/ API - DOC: ${element.DOCUMENTO} - Ret API: ${resultado.Mensagem} - Prot: ${resultado.Protocolo}`)
             } else {
                 sendLog('ALERTA',`Envio p/ API - DOC: ${element.DOCUMENTO} - (Sem retorno)`)
             }
 
-            // grava dados
-        } else {
-            // grava dados
-        }
-
+        } 
     })
 
     return ret   
