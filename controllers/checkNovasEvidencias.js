@@ -16,16 +16,18 @@ async function checkNovasEvidencias() {
             origem: 'EASYDOCS',
             load: 1,
             send: 0,
+            protocolo: '',
         }
         gravaRegistroEvidencias(params)
     }
-    function gravaEvidenciasSend_OK(documento){
+    function gravaEvidenciasSend_OK( documento, protocolo ){
         let params = {
             documento: documento,
             enviado: 1,
             origem: 'EASYDOCS',
             load: 1,
             send: 0,
+            protocolo: protocolo,
         }
         gravaRegistroEvidencias(params)
     }
@@ -62,7 +64,7 @@ async function checkNovasEvidencias() {
             } else if ( resultado.Sucesso == false ) { 
                 sendLog('WARNING',`Envio p/ API - DOC: ${element.DOCUMENTO} - Ret API: ${resultado.Mensagem} - Prot: ${resultado.Protocolo}`)
             } else if ( resultado.Sucesso == true ) { 
-                gravaEvidenciasSend_OK(element.DOCUMENTO)
+                gravaEvidenciasSend_OK(element.DOCUMENTO, resultado.Protocolo)
                 sendLog('SUCESSO',`Envio p/ API - DOC: ${element.DOCUMENTO} - Ret API: ${resultado.Mensagem} - Prot: ${resultado.Protocolo}`)
             } else {
                 sendLog('ALERTA',`Envio p/ API - DOC: ${element.DOCUMENTO} - (Sem retorno)`)

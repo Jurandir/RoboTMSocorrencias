@@ -10,7 +10,8 @@ async function gravaRegistroEvidencias(evidencia) {
                      COMPROVANTE_ORIGEM  = '${evidencia.origem}',
                      DT_ENVIO            = CURRENT_TIMESTAMP, 
                      QTDE_LOAD           = QTDE_LOAD + ${evidencia.load},
-                     QTDE_SEND           = QTDE_SEND + ${evidencia.send}
+                     QTDE_SEND           = QTDE_SEND + ${evidencia.send},
+                     PROTOCOLO           = '${evidencia.protocolo}'
                 WHERE
                      DOCUMENTO = '${evidencia.documento}' `
     try {
