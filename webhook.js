@@ -193,19 +193,21 @@ let chacaNovasOcorencias = setInterval(() => {
 let  loopEvidencias = setInterval(() => {
   load_evidencias++
   sendLog('INFO',`Check novas evidências - (QTDE: ${load_evidencias}, INTERNALO: ${time_evidencias})`)
-
-  // 
-  checkNovasEvidencias().then((dados)=>{
-    if (dados.rowsAffected > 0) {
-      check_evidencias += dados.rowsAffected 
-      sendLog('AVISO',`Proces Evidências - (QTDE: ${dados.rowsAffected}, TOTAL: ${check_evidencias})`)
-    }
-    ShowInfo()
-  })
-
+  novasEvidencias()
 }, time_evidencias )
 
+// Checa novas evidências
+function novasEvidencias() {
+    checkNovasEvidencias().then((dados)=>{
+      if (dados.rowsAffected > 0) {
+        check_evidencias += dados.rowsAffected 
+        sendLog('AVISO',`Proces Evidências - (QTDE: ${dados.rowsAffected}, TOTAL: ${check_evidencias})`)
+      }
+      ShowInfo()
+    })
+}
 
+novasEvidencias()
 
 /// *** PENDENCIAS ***
 /// - Rotina para leitura e envio de imagens da Agile

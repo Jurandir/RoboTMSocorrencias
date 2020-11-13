@@ -26,3 +26,5 @@ DADOS:
 select * from CARGASSQL.dbo.MNF  -- CHEGADA / statusbaixa
 select * from CARGASSQL.dbo.TRB -- LINK ( Conhecimento X Manifesto )
 
+tail -n30 -s3 -f ./log/log2020-11-13.log
+

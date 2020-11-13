@@ -16,11 +16,11 @@ const checkImagemEasyDocs = async (documento) => {
                   base64Str.msg   = resposta.err.message
                   sendLog('ERRO',`Imagem EasyDocs ${documento} : ${base64Str.msg}`)
             } else 
-            if (!resposta.Retorno) {
+            if (resposta.Retorno==false) {
                   base64Str.msg   = 'Não tem a imagem solicitada.'
-                  sendLog('WARNING',`Imagem EasyDocs ${documento} : ${base64Str.msg}`)
+                  // sendLog('WARNING',`Imagem EasyDocs ${documento} : ${base64Str.msg}`)
             } else 
-            if (resposta.Retorno) {
+            if (resposta.Retorno==true) {
                   base64Str.msg   = 'Imagem recebida.'
                   base64Str.ok     = true
                   base64Str.imagem = `${resposta.Imagem}`
