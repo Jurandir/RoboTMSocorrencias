@@ -25,8 +25,8 @@ async function checkNovasEvidencias() {
             documento: documento,
             enviado: 1,
             origem: 'EASYDOCS',
-            load: 1,
-            send: 0,
+            load: 0,
+            send: 1,
             protocolo: protocolo,
         }
         gravaRegistroEvidencias(params)
@@ -56,18 +56,18 @@ async function checkNovasEvidencias() {
                 gravaEvidenciasLoad_OK(element.DOCUMENTO)
             } catch (err) {
                 isErr = true
-                sendLog('WARNING',`Envio para API -DOC:${element.DOCUMENTO} - (Sem Resposta)` )
+                sendLog('WARNING',`Envio p/API-DOC:${element.DOCUMENTO} - (Sem Resposta)` )
             }
 
             if (isAxiosError==true) { 
-                sendLog('ERRO',`Envio para API -DOC:${element.DOCUMENTO} - (Axios ERRO)` ) 
+                sendLog('ERRO',`Envio p/API-DOC:${element.DOCUMENTO} - (Axios ERRO)` ) 
             } else if ( resultado.Sucesso == false ) { 
-                sendLog('WARNING',`Envio p/ API - DOC: ${element.DOCUMENTO} - Ret API: ${resultado.Mensagem} - Prot: ${resultado.Protocolo}`)
+                sendLog('WARNING',`Envio p/API-DOC: ${element.DOCUMENTO} - Ret API: ${resultado.Mensagem} - Prot: ${resultado.Protocolo}`)
             } else if ( resultado.Sucesso == true ) { 
                 gravaEvidenciasSend_OK(element.DOCUMENTO, resultado.Protocolo)
-                sendLog('SUCESSO',`Envio p/ API - DOC: ${element.DOCUMENTO} - Ret API: ${resultado.Mensagem} - Prot: ${resultado.Protocolo}`)
+                sendLog('SUCESSO',`Envio p/API-DOC: ${element.DOCUMENTO} - Ret API: ${resultado.Mensagem} - Prot: ${resultado.Protocolo}`)
             } else {
-                sendLog('ALERTA',`Envio p/ API - DOC: ${element.DOCUMENTO} - (Sem retorno)`)
+                sendLog('ALERTA',`Envio p/API-DOC: ${element.DOCUMENTO} - (Sem retorno)`)
             }
 
         } 

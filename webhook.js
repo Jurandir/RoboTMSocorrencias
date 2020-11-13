@@ -1,3 +1,6 @@
+//-- Versão Inicial em ( 13/11/2020 ) 
+//-- Versão Atual   em ( 13/11/2020 ) 
+//-- By: Jurandir Ferreira
 const colors = require('colors')
 
 require('dotenv').config()
@@ -94,7 +97,7 @@ let enviaDados = async () => {
                   err_prep++ // Erro ainda não tratado
               }
 
-              sendLog(str_ref,`Ocorr ID: ${element.ID} - Ret API: ${retorno.Mensagem} - Prot: ${retorno.Protocolo}`)
+              sendLog(str_ref,`Ocorr ID: ${element.ID} - DOC: ${element.DOCUMENTO} - Ret-API: ${retorno.Mensagem} - Prot: ${retorno.Protocolo}`)
 
               // Grava retorno recebido, na base SIC, vindo da API do Cliente
               gravaRetornoCliente(element,retorno).then((resposta)=>{
@@ -142,34 +145,34 @@ let chacaNovasOcorencias = setInterval(() => {
 
   // Checa se há novos manifestos (SAÍDA NO CENTRO DE DISTRIBUIÇÃO (CDOUT))
   checkNovasOcorenciasManifesto().then((dados)=>{
-      inseridos += dados.rowsAffected 
       if (dados.rowsAffected > 0) {
+        inseridos += dados.rowsAffected 
         sendLog('AVISO',`Novas Ocorrências - (QTDE: ${dados.rowsAffected}, TOTAL: ${inseridos})`)
       }
   })
 
   // Checa se há novos conhecimentos iniciados ( Ocorrencia : PROCESSO DE TRANSPORTE INICIADO )
   checkNovasOcorenciasIniciais().then((dados)=>{
-      inseridos += dados.rowsAffected 
       if (dados.rowsAffected > 0) {
+        inseridos += dados.rowsAffected 
         sendLog('AVISO',`Conhecimentos Iniciados - (QTDE: ${dados.rowsAffected}, TOTAL: ${inseridos})`)
       }
   })
   
   // Checa se há novas ocorrencias no GARGAS
   checkNovasOcorencias().then((dados)=>{
-      inseridos += dados.rowsAffected 
       if (dados.rowsAffected > 0) {
+        inseridos += dados.rowsAffected 
         sendLog('AVISO',`Novas Ocorrências - (QTDE: ${dados.rowsAffected}, TOTAL: ${inseridos})`)
       }
   })
 
   // Checa existe ocorrencias não enviadas na base SIC
   getNovasOcorencias().then((dados)=>{
-      naoEnviadas = dados[0].QTDE
-      ShowInfo()
-      if (naoEnviadas > 0) { 
-          // Chama processo de envio de dados quando existe dados não enviados
+      if (dados[0].QTDE > 0) { 
+          naoEnviadas = dados[0].QTDE
+          ShowInfo()
+        // Chama processo de envio de dados quando existe dados não enviados
           enviaDados()
       }
   })
@@ -177,8 +180,8 @@ let chacaNovasOcorencias = setInterval(() => {
   // Checa e revalida reenvios
   if (naoEnviadas == 0) {
       reenvioDeOcorencias().then((dados)=>{
-          reenvios += dados.rowsAffected 
           if (dados.rowsAffected > 0) {
+            reenvios += dados.rowsAffected 
             sendLog('AVISO',`Ocorrências ReEnviadas- (QTDE: ${dados.rowsAffected}, TOTAL: ${reenvios})`)
           }
       }) 
@@ -193,38 +196,17 @@ let  loopEvidencias = setInterval(() => {
 
   // 
   checkNovasEvidencias().then((dados)=>{
-    check_evidencias += dados.rowsAffected 
+    if (dados.rowsAffected > 0) {
+      check_evidencias += dados.rowsAffected 
+      sendLog('AVISO',`Proces Evidências - (QTDE: ${dados.rowsAffected}, TOTAL: ${check_evidencias})`)
+    }
     ShowInfo()
   })
 
 }, time_evidencias )
 
 
-/// teste
-checkNovasEvidencias().then((ret)=>{
-    check_evidencias += ret.rowsAffected 
-    //let rowsAffected  = ret.rowsAffected
-    //let qtdeSucesso   = ret.qtdeSucesso
-    //sendLog('INFO',`Documentos - ( REQUISITADOS: ${rowsAffected}, RETORNADOS: ${qtdeSucesso})`)
-    ShowInfo()   
-})
-
-
-
-//--- envia para SEVA/CLIENTE
-//--- retorna SUCESSO ou FALHA
-
-
-
-
 
 /// *** PENDENCIAS ***
-/// - Rotina para leitura e envio de imagens da EasyDOC ou da Agile
-////// - Easydocs : 1-criar campo em CONHECIMENTO para STATUS do envio da imagem
-////// - Easydocs : 2-realizar laco em CONHECIMENTO com imagem não enviadas
-////// - Easydocs : 3-Fazer nova tentativa a cada 30 ninutos se não sucesso
-////// - Easydocs : 4-tentar por 7 dias
-
-
-
-
+/// - Rotina para leitura e envio de imagens da Agile
+/// - Easydocs e agile : tentar por 7 dias em caso de erro

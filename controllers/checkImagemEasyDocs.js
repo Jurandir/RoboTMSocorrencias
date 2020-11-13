@@ -13,7 +13,7 @@ const checkImagemEasyDocs = async (documento) => {
     await getImageEasydocs(empresa,ctrc ).then((resposta)=>{
 
             if (resposta.isErr) {
-                  base64Str.msg   = JSON.stringify(resposta)
+                  base64Str.msg   = resposta.err.message
                   sendLog('ERRO',`Imagem EasyDocs ${documento} : ${base64Str.msg}`)
             } else 
             if (!resposta.Retorno) {

@@ -6,7 +6,7 @@
 USE [SIC]
 GO
 
-CREATE VIEW OCORRENCIAS_BAIXAS_VW
+ALTER VIEW OCORRENCIAS_BAIXAS_VW
 AS  
  SELECT   
 	CNH.%%physloc%%                           as ID,
@@ -36,8 +36,10 @@ AS
 	'BAIXA'                                   as OUN_CHAVE,
 	CAST(NULL AS DATETIME)                    as OUN_DATE,
 	98                                        as OUN_CODIGO
-FROM CARGASSQL.dbo.CNH
-    JOIN SIC.dbo.CONHECIMENTO CON        ON CON.DOCUMENTO  = CONCAT(CNH.EMP_CODIGO,SERIE,CTRC)
+FROM  SIC.dbo.CONHECIMENTO CON
+    JOIN CARGASSQL.dbo.CNH               ON CNH.EMP_CODIGO = SUBSTRING(CON.DOCUMENTO,1,3) AND
+	                                        CNH.SERIE      = SUBSTRING(CON.DOCUMENTO,4,1) AND
+											CNH.CTRC       = SUBSTRING(CON.DOCUMENTO,5,10)
 	JOIN SIC.dbo.CLIENTES CLI            ON CLI.CNPJ_CLI   = SUBSTRING(CNH.CLI_CGCCPF_PAG,1,8)  OR 
 											CLI.CNPJ_CLI   = SUBSTRING(CNH.CLI_CGCCPF_DEST,1,8) OR
 											CLI.CNPJ_CLI   = SUBSTRING(CNH.CLI_CGCCPF_REMET,1,8)
