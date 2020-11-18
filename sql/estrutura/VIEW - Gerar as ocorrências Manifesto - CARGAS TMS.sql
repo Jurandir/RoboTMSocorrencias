@@ -28,7 +28,7 @@ AS
     89                                        as OCORRTRANSPORTE,
     89                                        as OCORRSIMPLIFICADA,
 	CLI.URL_OCORRENCIA                        as URL_ENDPOINT,
-	'2'                                       as TIPOIMAGEM,
+	'1'                                       as TIPOIMAGEM,
     NULL                                      as RET_MENSAGEM,
     NULL                                      as RET_PROTOCOLO,
     0                                         as RET_SUCESSO, 

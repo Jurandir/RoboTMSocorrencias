@@ -43,9 +43,10 @@ FROM  SIC.dbo.CONHECIMENTO CON
     JOIN CARGASSQL.dbo.CTE               ON CTE.EMP_CODIGO_CNH = CNH.EMP_CODIGO	AND 
 	                                        CTE.CNH_SERIE      = CNH.SERIE	AND 
 											CTE.CNH_CTRC       = CNH.CTRC											
-	JOIN SIC.dbo.CLIENTES CLI            ON CLI.CNPJ_CLI       = SUBSTRING(CNH.CLI_CGCCPF_PAG,1,8)  OR 
+	JOIN SIC.dbo.CLIENTES CLI            ON CLI.REF_LAYOUT = 1 AND (
+	                                        CLI.CNPJ_CLI       = SUBSTRING(CNH.CLI_CGCCPF_PAG,1,8)  OR 
 											CLI.CNPJ_CLI       = SUBSTRING(CNH.CLI_CGCCPF_DEST,1,8) OR
-											CLI.CNPJ_CLI       = SUBSTRING(CNH.CLI_CGCCPF_REMET,1,8)
+											CLI.CNPJ_CLI       = SUBSTRING(CNH.CLI_CGCCPF_REMET,1,8) )
 	LEFT JOIN SIC.dbo.OCORRENCIAS ORR    ON ORR.DOCUMENTO      = CONCAT(CNH.EMP_CODIGO,SERIE,CTRC) AND
 	                                        ORR.OUN_CHAVE      = 'INIT'
 WHERE 
