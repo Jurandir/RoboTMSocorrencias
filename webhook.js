@@ -1,5 +1,5 @@
 //-- Versão Inicial em ( 13/11/2020 ) 
-//-- Versão Atual   em ( 13/11/2020 ) 
+//-- Versão Atual   em ( 19/11/2020 ) ( PRECISA REFATORAR )
 //-- By: Jurandir Ferreira
 const colors = require('colors')
 
@@ -67,6 +67,11 @@ let enviaDados = async () => {
       let retorno = { Sucesso:false, Mensagem:'Falha ao acessar API', Protocolo: 'S/N'  }
       let str_ref = 'AVISO'
 
+      //if ( ocorrencia_id > inicio_id ) {
+      //  inicio_id = ocorrencia_id 
+     // }
+      
+     // if ( ocorrencia_id >= inicio_id ) { // if para evitar envioConcorrente (REFATORAR DEPOIS)
         try {
               // envia ocorrencia para API do cliente              
               ret = await enviaOcorrencia(element,cliente)
@@ -117,84 +122,147 @@ let enviaDados = async () => {
         }
 
         ShowInfo()   
+      //}
 
     })
   })
 }
 
+// Fluxo de execução
+//let inicio_id                       = 0
+let x_checkBaixaManifesto           = true
+let x_checkNovosConhecimentos       = true
+let x_checkNovasOcorenciasManifesto = true
+let x_checkNovasOcorenciasIniciais  = true
+let x_checkNovasOcorencias          = true
+let x_getNovasOcorencias            = true
+let x_reenvioDeOcorencias           = true
+let x_novasEvidencias               = true
+
+  
 // Checa novas ocorrências a cada ($check_time$)
 let chacaNovasOcorencias = setInterval(() => {
   checks++
   ShowInfo()
 
  // Baixa manifesto ( CHEGADA NA CIDADE OU FILIAL DE DESTINO ) 
-  checkBaixaManifesto().then((dados)=>{
-      baixaManifesto += dados.rowsAffected 
-      if (dados.rowsAffected > 0) {
-        sendLog('AVISO',`Baixa de Manifesto - (QTDE: ${dados.rowsAffected}, TOTAL: ${baixaManifesto})`)
-      }
-  })
+  if (x_checkBaixaManifesto == true ) {
+
+      x_checkBaixaManifesto  = false
+      checkBaixaManifesto().then((dados)=>{
+            baixaManifesto += dados.rowsAffected 
+            if (dados.rowsAffected > 0) {
+              sendLog('AVISO',`Baixa de Manifesto - (QTDE: ${dados.rowsAffected}, TOTAL: ${baixaManifesto})`)
+            }
+            x_checkBaixaManifesto  = true
+      })
+
+  }
 
   // Checa se há novos conhecimentos
-  checkNovosConhecimentos().then((dados)=>{
-      conhecimentos += dados.rowsAffected 
-      if (dados.rowsAffected > 0) {
-        sendLog('AVISO',`Conhecimentos - (QTDE: ${dados.rowsAffected}, TOTAL: ${conhecimentos})`)
-      }
-  })
+  if (x_checkNovosConhecimentos == true ) {
+
+      x_checkNovosConhecimentos  = false
+      checkNovosConhecimentos().then((dados)=>{
+          conhecimentos += dados.rowsAffected 
+          if (dados.rowsAffected > 0) {
+            sendLog('AVISO',`Conhecimentos - (QTDE: ${dados.rowsAffected}, TOTAL: ${conhecimentos})`)
+          }
+          x_checkNovosConhecimentos  = true
+      })
+
+  }
 
   // Checa se há novos manifestos (SAÍDA NO CENTRO DE DISTRIBUIÇÃO (CDOUT))
-  checkNovasOcorenciasManifesto().then((dados)=>{
-      if (dados.rowsAffected > 0) {
-        inseridos += dados.rowsAffected 
-        sendLog('AVISO',`Novas Ocorrências - (QTDE: ${dados.rowsAffected}, TOTAL: ${inseridos})`)
-      }
-  })
+  if (x_checkNovasOcorenciasManifesto == true ) {
+
+      x_checkNovasOcorenciasManifesto  = false
+      checkNovasOcorenciasManifesto().then((dados)=>{
+          if (dados.rowsAffected > 0) {
+            inseridos += dados.rowsAffected 
+            sendLog('AVISO',`Novas Ocorrências - (QTDE: ${dados.rowsAffected}, TOTAL: ${inseridos})`)
+          }
+          x_checkNovasOcorenciasManifesto  = true
+      })
+
+  }
 
   // Checa se há novos conhecimentos iniciados ( Ocorrencia : PROCESSO DE TRANSPORTE INICIADO )
-  checkNovasOcorenciasIniciais().then((dados)=>{
-      if (dados.rowsAffected > 0) {
-        inseridos += dados.rowsAffected 
-        sendLog('AVISO',`Conhecimentos Iniciados - (QTDE: ${dados.rowsAffected}, TOTAL: ${inseridos})`)
-      }
-  })
+  if (x_checkNovasOcorenciasIniciais == true ) {
+
+      x_checkNovasOcorenciasIniciais  = false
+      checkNovasOcorenciasIniciais().then((dados)=>{
+          if (dados.rowsAffected > 0) {
+            inseridos += dados.rowsAffected 
+            sendLog('AVISO',`Conhecimentos Iniciados - (QTDE: ${dados.rowsAffected}, TOTAL: ${inseridos})`)
+          }
+          x_checkNovasOcorenciasIniciais  = true
+      })
+
+  }    
   
   // Checa se há novas ocorrencias no GARGAS
-  checkNovasOcorencias().then((dados)=>{
-      if (dados.rowsAffected > 0) {
-        inseridos += dados.rowsAffected 
-        sendLog('AVISO',`Novas Ocorrências - (QTDE: ${dados.rowsAffected}, TOTAL: ${inseridos})`)
-      }
-  })
+  if (x_checkNovasOcorencias == true ) {
+
+      x_checkNovasOcorencias  = false
+      checkNovasOcorencias().then((dados)=>{
+          if (dados.rowsAffected > 0) {
+            inseridos += dados.rowsAffected 
+            sendLog('AVISO',`Novas Ocorrências - (QTDE: ${dados.rowsAffected}, TOTAL: ${inseridos})`)
+          }
+          x_checkNovasOcorencias  = true
+      })
+
+  }
 
   // Checa existe ocorrencias não enviadas na base SIC
-  getNovasOcorencias().then((dados)=>{
-      if (dados[0].QTDE > 0) { 
-          naoEnviadas = dados[0].QTDE
-          ShowInfo()
-        // Chama processo de envio de dados quando existe dados não enviados
-          enviaDados()
-      }
-  })
+  if (x_getNovasOcorencias == true ) {
+
+      x_getNovasOcorencias  = false
+      getNovasOcorencias().then((dados)=>{
+          if (dados[0].QTDE > 0) { 
+              naoEnviadas = dados[0].QTDE
+              ShowInfo()
+            // Chama processo de envio de dados quando existe dados não enviados
+              enviaDados()
+          } else {
+            // inicio_id = 0
+          }
+          x_getNovasOcorencias  = true
+      })
+
+  }    
 
   // Checa e revalida reenvios
   if (naoEnviadas == 0) {
-      reenvioDeOcorencias().then((dados)=>{
+    if (x_reenvioDeOcorencias == true ) {
+
+        x_reenvioDeOcorencias  = false
+        reenvioDeOcorencias().then((dados)=>{
           if (dados.rowsAffected > 0) {
             reenvios += dados.rowsAffected 
             sendLog('AVISO',`Ocorrências ReEnviadas- (QTDE: ${dados.rowsAffected}, TOTAL: ${reenvios})`)
           }
-      }) 
+          x_reenvioDeOcorencias  = true
+      })
+
+    } 
   }
 }, check_time )
 
 
 // Checa novas evidências a cada ($time_evidencias$)
-let  loopEvidencias = setInterval(() => {
-  load_evidencias++
-  sendLog('INFO',`Check novas evidências - (QTDE: ${load_evidencias}, INTERNALO: ${time_evidencias})`)
-  novasEvidencias()
-}, time_evidencias )
+//let  loopEvidencias = setInterval(() => {
+//  load_evidencias++
+//  sendLog('INFO',`Check novas evidências - (QTDE: ${load_evidencias}, INTERNALO: ${time_evidencias})`)
+//  if (x_novasEvidencias == true ) {
+//    x_novasEvidencias  = false
+//    novasEvidencias().then(()=>{
+//      x_novasEvidencias  = true
+//    })
+//  }
+//
+//}, time_evidencias )
 
 // Checa novas evidências
 function novasEvidencias() {
@@ -207,8 +275,19 @@ function novasEvidencias() {
     })
 }
 
-// novasEvidencias()
+
+
+const geraComprovantes = function() {
+  if (x_novasEvidencias==true) {
+      novasEvidencias()
+  }    
+  setTimeout(geraComprovantes, time_evidencias);
+}
+
+//setTimeout(geraComprovantes, 5000);
+
 
 /// *** PENDENCIAS ***
 /// - Rotina para leitura e envio de imagens da Agile
 /// - Easydocs e agile : tentar por 7 dias em caso de erro
+/// - REFATORAR : Transformar ForEach em Map+Promises
