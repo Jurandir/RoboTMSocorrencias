@@ -5,8 +5,7 @@
   "main": "webhook.js",
   "scripts": {
     "run": "node .",
-    "start": "npx nodemon .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node ."
   },
   "author": "Jurandir Ferreira",
   "license": "ISC",

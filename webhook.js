@@ -207,7 +207,7 @@ function novasEvidencias() {
     })
 }
 
-novasEvidencias()
+// novasEvidencias()
 
 /// *** PENDENCIAS ***
 /// - Rotina para leitura e envio de imagens da Agile
