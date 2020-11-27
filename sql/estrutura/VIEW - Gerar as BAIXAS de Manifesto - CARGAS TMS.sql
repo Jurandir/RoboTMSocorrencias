@@ -1,3 +1,4 @@
+-- (27/11/2020)
 -- CARGASSQL.dbo.
 -- SIC.dbo.
 -- CREATE [ OR ALTER ] VIEW
