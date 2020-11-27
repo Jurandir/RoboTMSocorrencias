@@ -28,3 +28,7 @@ select * from CARGASSQL.dbo.TRB -- LINK ( Conhecimento X Manifesto )
 
 tail -n30 -s3 -f ./log/log2020-11-13.log
 
+/// *** PENDENCIAS ***
+/// - Rotina para leitura e envio de imagens da Agile
+/// - Easydocs e agile : tentar por 7 dias em caso de erro
+/// - REFATORAR : Transformar ForEach em Map+Promises

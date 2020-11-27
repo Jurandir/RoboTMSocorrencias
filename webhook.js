@@ -1,5 +1,5 @@
 //-- Versão Inicial em ( 13/11/2020 ) 
-//-- Versão Atual   em ( 19/11/2020 ) ( PRECISA REFATORAR )
+//-- Versão Atual   em ( 27/11/2020 ) ( PRECISA REFATORAR )
 //-- By: Jurandir Ferreira
 const colors = require('colors')
 
@@ -67,11 +67,6 @@ let enviaDados = async () => {
       let retorno = { Sucesso:false, Mensagem:'Falha ao acessar API', Protocolo: 'S/N'  }
       let str_ref = 'AVISO'
 
-      //if ( ocorrencia_id > inicio_id ) {
-      //  inicio_id = ocorrencia_id 
-     // }
-      
-     // if ( ocorrencia_id >= inicio_id ) { // if para evitar envioConcorrente (REFATORAR DEPOIS)
         try {
               // envia ocorrencia para API do cliente              
               ret = await enviaOcorrencia(element,cliente)
@@ -250,20 +245,6 @@ let chacaNovasOcorencias = setInterval(() => {
   }
 }, check_time )
 
-
-// Checa novas evidências a cada ($time_evidencias$)
-//let  loopEvidencias = setInterval(() => {
-//  load_evidencias++
-//  sendLog('INFO',`Check novas evidências - (QTDE: ${load_evidencias}, INTERNALO: ${time_evidencias})`)
-//  if (x_novasEvidencias == true ) {
-//    x_novasEvidencias  = false
-//    novasEvidencias().then(()=>{
-//      x_novasEvidencias  = true
-//    })
-//  }
-//
-//}, time_evidencias )
-
 // Checa novas evidências
 function novasEvidencias() {
     checkNovasEvidencias().then((dados)=>{
@@ -275,8 +256,6 @@ function novasEvidencias() {
     })
 }
 
-
-
 const geraComprovantes = function() {
   if (x_novasEvidencias==true) {
       novasEvidencias()
@@ -284,10 +263,6 @@ const geraComprovantes = function() {
   setTimeout(geraComprovantes, time_evidencias);
 }
 
-//setTimeout(geraComprovantes, 5000);
+setTimeout(geraComprovantes, 5000)
 
 
-/// *** PENDENCIAS ***
-/// - Rotina para leitura e envio de imagens da Agile
-/// - Easydocs e agile : tentar por 7 dias em caso de erro
-/// - REFATORAR : Transformar ForEach em Map+Promises
