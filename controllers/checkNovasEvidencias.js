@@ -43,11 +43,13 @@ async function checkNovasEvidencias() {
     ret.rowsAffected = dados.length
 
     async function getTodos() {
+
         const promises = dados.map(async (element, idx) => {
             let resultado    = {Mensagem:'Sem resposta',Protocolo:'[IMAGEM]',Sucesso:false}
             let isErr        = true
             let isAxiosError = true
             let origem       = 'EASYDOCS'
+            let imagemRUIM   = false
 
             let evidencia = await easydocs(element.DOCUMENTO)
 
@@ -59,33 +61,45 @@ async function checkNovasEvidencias() {
 
             if (evidencia.ok==false){
                 sendLog('WARNING',`(EasyDocs,AgileProcess) DOC:${element.DOCUMENTO} - (Não achou a imagem solicitada) (006) (${origem})` )
-            } else
-            if (evidencia.ok==true){
+            } 
+            else if (evidencia.ok==true){
+                imagemRUIM   = false
                 ret.qtdeSucesso++
+                //-------------------
                 try {
-                    let resposta     = await enviaEvidencias( element, evidencia.imagem )
-                    isErr            = resposta.isErr
-                    isAxiosError     = resposta.isAxiosError || false
-                    resultado        = resposta.dados.EvidenciaOcorrenciaResult
+                    if(evidencia.imagem.length<200) {
+                        imagemRUIM   = true
+                        sendLog('AVISO:',`DOC: ${element.DOCUMENTO} - (${origem}) - Imagem corrumpida ou qualidade ruim` )
+                    } else {
+                        let resposta     = await enviaEvidencias( element, evidencia.imagem )
+                        isErr            = resposta.isErr
+                        isAxiosError     = resposta.isAxiosError || false
+                        resultado        = resposta.dados.EvidenciaOcorrenciaResult
+                    }
                     gravaEvidenciasLoad_OK(element.DOCUMENTO, origem)
                 } catch (err) {
                     isErr = true
                     sendDebug('DOC:'+element.DOCUMENTO, `(${origem}) param:`+JSON.stringify(element) )
                     sendLog('WARNING',`Envio p/API-DOC:${element.DOCUMENTO} - (002) (${origem})` )
                 }
-    
-                if ((isAxiosError==true) || (isErr==true)) { 
-                    sendLog('ERRO',`Envio p/API-DOC:${element.DOCUMENTO} - (001) (${origem})` ) 
-                } else if ( resultado.Sucesso == false ) { 
-                    sendLog('WARNING',`Envio p/API-DOC: ${element.DOCUMENTO} - Ret API: ${resultado.Mensagem} - Prot: ${resultado.Protocolo} (004) (${origem})`)
-                } else if ( resultado.Sucesso == true ) { 
-                    gravaEvidenciasSend_OK(element.DOCUMENTO, resultado.Protocolo, origem)
-                    sendLog('SUCESSO',`Envio p/API-DOC: ${element.DOCUMENTO} - Ret API: ${resultado.Mensagem} - Prot: ${resultado.Protocolo} (005) (${origem})`)
-                } else {
-                    sendLog('ALERTA',`Envio p/API-DOC: ${element.DOCUMENTO} - (003) (${origem})`)
+                //-------------------
+                if (imagemRUIM == false){
+                    if ((isAxiosError==true) || (isErr==true)) { 
+                        sendLog('ERRO',`Envio p/API-DOC:${element.DOCUMENTO} - (001) (${origem})` ) 
+                    } else if ( resultado.Sucesso == false ) { 
+                        sendLog('WARNING',`Envio p/API-DOC: ${element.DOCUMENTO} - Ret API: ${resultado.Mensagem} - Prot: ${resultado.Protocolo} (004) (${origem})`)
+                    } else if ( resultado.Sucesso == true ) { 
+                        gravaEvidenciasSend_OK(element.DOCUMENTO, resultado.Protocolo, origem)
+                        sendLog('SUCESSO',`Envio p/API-DOC: ${element.DOCUMENTO} - Ret API: ${resultado.Mensagem} - Prot: ${resultado.Protocolo} (005) (${origem})`)
+                    } else {    
+                        sendLog('ALERTA',`Envio p/API-DOC: ${element.DOCUMENTO} - (003) (${origem})`)
+                        sendDebug('DOC:'+element.DOCUMENTO, `(${origem}) param:`+JSON.stringify(element) )
+                    }
                 }
+                //-------------------
             } 
         })
+        
         await Promise.all(promises)
     }
     await getTodos()
