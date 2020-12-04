@@ -1,5 +1,8 @@
 const axios         = require('axios')
 const sendLog       = require('../utils/sendLog')
+const sendDebug     = require('../utils/sendDebug')
+
+const debug_log     = process.env.DEBUG_LOG || 'OFF'
 
 const formataDataBD            = require('../utils/formataDataBD')
 const selectChaveValidaCliente = require('../utils/selectChaveValidaCliente')
@@ -10,8 +13,7 @@ const enviaOcorrencia = async ( ocorrencia, cliente ) => {
     const url = cliente.SERVIDOR + cliente.URL_OCORRENCIA
     const config = {
       headers: { "Content-Type": 'application/json' }
-      }
-  
+    }  
     let bodyParameters = {
         "login": cliente.LOGIN,
         "senha": cliente.SENHA,
@@ -26,10 +28,12 @@ const enviaOcorrencia = async ( ocorrencia, cliente ) => {
       }
       try {       
           ret = await axios.post(url,  bodyParameters, config)
+          sendDebug(ocorrencia.CHAVEORIGINAL, '(OCORRÊNCIA) param:'+JSON.stringify(bodyParameters)+',config:'+JSON.stringify(config) )
           return { dados : ret.data, isErr: false, isAxiosError: ret.isAxiosError }
       } catch (err) { 
           dados = {err, isErr: true, url: url, isAxiosError: true } 
           sendLog('ERRO', JSON.stringify(dados) )
+          sendDebug(ocorrencia.CHAVEORIGINAL, '(OCORRÊNCIA ERRO) param:'+JSON.stringify(bodyParameters)+',config:'+JSON.stringify(config) )
           return dados
       }
 }

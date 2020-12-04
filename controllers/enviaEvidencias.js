@@ -1,5 +1,6 @@
 const axios         = require('axios')
 const sendLog       = require('../utils/sendLog')
+const sendDebug     = require('../utils/sendDebug')
 
 const selectChaveValidaCliente = require('../utils/selectChaveValidaCliente')
 
@@ -20,12 +21,14 @@ const enviaEvidencias = async ( evidencia, imagem ) => {
         "replicar": "",
       }
       try {       
-          //console.log(bodyParameters,config)
           ret = await axios.post(url,  bodyParameters, config)
-          //console.log(ret)
+          bodyParameters.imagem = `(STRING_IMAGEM_BASE64) LEN:'+ ${bodyParameters.imagem.length}`
+          sendDebug(evidencia.CHAVEORIGINAL, '(IMAGEM) param:'+JSON.stringify(bodyParameters)+',config:'+JSON.stringify(config) )
           return { dados : ret.data, isErr: false, isAxiosError: ret.isAxiosError }
       } catch (err) { 
           dados = {err, isErr: true, url: url, isAxiosError: true, rotina:"enviaEvidencias" } 
+          bodyParameters.imagem = `(STRING_IMAGEM_BASE64) LEN:'+ ${bodyParameters.imagem.length}`
+          sendDebug(evidencia.CHAVEORIGINAL, '(IMAGEM ERRO) param:'+JSON.stringify(bodyParameters)+',config:'+JSON.stringify(config) )
           sendLog('ERRO', JSON.stringify(dados) )
           return dados
       }

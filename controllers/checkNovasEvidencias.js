@@ -1,7 +1,9 @@
 const getEvidencias           = require('./getEvidencias')
 const gravaRegistroEvidencias = require('./gravaRegistroEvidencias')
 const sendLog                 = require('../utils/sendLog')
+const sendDebug               = require('../utils/sendDebug')
 const easydocs                = require('../controllers/checkImagemEasyDocs')
+const agileprocess            = require('../controllers/checkImagemAgileProcess')
 const enviaEvidencias         = require('../controllers/enviaEvidencias')
 
 async function checkNovasEvidencias() {  
@@ -9,22 +11,22 @@ async function checkNovasEvidencias() {
     let dados = await getEvidencias()
     let ultimo_doc
 
-    function gravaEvidenciasLoad_OK(documento){
+    function gravaEvidenciasLoad_OK(documento, origem){
         let params = {
             documento: documento,
             enviado: 0,
-            origem: 'EASYDOCS',
+            origem: origem,
             load: 1,
             send: 0,
             protocolo: '',
         }
         gravaRegistroEvidencias(params)
     }
-    function gravaEvidenciasSend_OK( documento, protocolo ){
+    function gravaEvidenciasSend_OK( documento, protocolo , origem){
         let params = {
             documento: documento,
             enviado: 1,
-            origem: 'EASYDOCS',
+            origem: origem,
             load: 0,
             send: 1,
             protocolo: protocolo,
@@ -45,46 +47,49 @@ async function checkNovasEvidencias() {
             let resultado    = {Mensagem:'Sem resposta',Protocolo:'[IMAGEM]',Sucesso:false}
             let isErr        = true
             let isAxiosError = true
+            let origem       = 'EASYDOCS'
 
-            evidencia = await easydocs(element.DOCUMENTO)
+            let evidencia = await easydocs(element.DOCUMENTO)
 
             if (evidencia.ok==false){
-                sendLog('WARNING',`EasyDocs DOC:${element.DOCUMENTO} - (Não achou a imagem solicitada)` )
+                // Não achou na Easydocs e vai procurar na AgileProcess
+                origem       = 'AGILEPROCESS'
+                evidencia    = await agileprocess(element.DOCUMENTO)
+            } 
+
+            if (evidencia.ok==false){
+                sendLog('WARNING',`(EasyDocs,AgileProcess) DOC:${element.DOCUMENTO} - (Não achou a imagem solicitada) (006) (${origem})` )
             } else
             if (evidencia.ok==true){
                 ret.qtdeSucesso++
-                let resposta     = await enviaEvidencias( element, evidencia.imagem )
                 try {
-                    isErr        = resposta.isErr
-                    isAxiosError = resposta.isAxiosError || false
-                    resultado    = resposta.dados.EvidenciaOcorrenciaResult
-                    gravaEvidenciasLoad_OK(element.DOCUMENTO)
+                    let resposta     = await enviaEvidencias( element, evidencia.imagem )
+                    isErr            = resposta.isErr
+                    isAxiosError     = resposta.isAxiosError || false
+                    resultado        = resposta.dados.EvidenciaOcorrenciaResult
+                    gravaEvidenciasLoad_OK(element.DOCUMENTO, origem)
                 } catch (err) {
                     isErr = true
-                    sendLog('WARNING',`Envio p/API-DOC:${element.DOCUMENTO} - (Sem Resposta)` )
+                    sendDebug('DOC:'+element.DOCUMENTO, `(${origem}) param:`+JSON.stringify(element) )
+                    sendLog('WARNING',`Envio p/API-DOC:${element.DOCUMENTO} - (002) (${origem})` )
                 }
     
-                if (isAxiosError==true) { 
-                    sendLog('ERRO',`Envio p/API-DOC:${element.DOCUMENTO} - (Axios ERRO)` ) 
+                if ((isAxiosError==true) || (isErr==true)) { 
+                    sendLog('ERRO',`Envio p/API-DOC:${element.DOCUMENTO} - (001) (${origem})` ) 
                 } else if ( resultado.Sucesso == false ) { 
-                    sendLog('WARNING',`Envio p/API-DOC: ${element.DOCUMENTO} - Ret API: ${resultado.Mensagem} - Prot: ${resultado.Protocolo}`)
+                    sendLog('WARNING',`Envio p/API-DOC: ${element.DOCUMENTO} - Ret API: ${resultado.Mensagem} - Prot: ${resultado.Protocolo} (004) (${origem})`)
                 } else if ( resultado.Sucesso == true ) { 
-                    gravaEvidenciasSend_OK(element.DOCUMENTO, resultado.Protocolo)
-                    sendLog('SUCESSO',`Envio p/API-DOC: ${element.DOCUMENTO} - Ret API: ${resultado.Mensagem} - Prot: ${resultado.Protocolo}`)
+                    gravaEvidenciasSend_OK(element.DOCUMENTO, resultado.Protocolo, origem)
+                    sendLog('SUCESSO',`Envio p/API-DOC: ${element.DOCUMENTO} - Ret API: ${resultado.Mensagem} - Prot: ${resultado.Protocolo} (005) (${origem})`)
                 } else {
-                    sendLog('ALERTA',`Envio p/API-DOC: ${element.DOCUMENTO} - (Sem retorno)`)
+                    sendLog('ALERTA',`Envio p/API-DOC: ${element.DOCUMENTO} - (003) (${origem})`)
                 }
-    
             } 
         })
         await Promise.all(promises)
     }
-    
     await getTodos()
-    
-    return ret   
-    
-    
+    return ret    
 }
 
 module.exports = checkNovasEvidencias
