@@ -3,11 +3,11 @@ const sendLog                = require('../utils/sendLog')
 
 const checkImagemAgileProcess = async (documento) => {
     let value    = documento
-    let base64Str = { ok:false, msg:'Sem retorno',imagem:''}
+    let base64Str = { ok:false, msg:'Sem retorno',imagem:'', list:[] }
 
     sendLog('INFO',`Solicitando imagem ${documento}, Aguardando AgileProcess...`)
 
-    await getImageAgileProcess( value ).then((resposta)=>{
+    await getImageAgileProcess( value ).then( async (resposta)=>{
 
             let msg           = 'Não tem a imagem solicitada.'
             let base64Image   = ''
@@ -21,8 +21,24 @@ const checkImagemAgileProcess = async (documento) => {
             if (!resposta.Err) {
 
                   try {
-                      base64Image   = resposta.dados.json_response[0].checkpoint.resources[0].content
-                      tipoConteudo  = resposta.dados.json_response[0].checkpoint.resources[0].content_type
+                     let resources = resposta.dados.json_response[0].checkpoint.resources
+                     let photo = resposta.dados.json_response[0].checkpoint.image
+
+                     if(photo) {
+                        tipoConteudo ='PHOTO'   
+                        base64Image  = JSON.parse(photo).photo
+                        base64Str.list.push(base64Image)
+                     }
+                 
+                     const promises = resources.map(async (element, idx) => { 
+                              base64Image   = element.content
+                              tipoConteudo  = element.content_type
+                              if (tipoConteudo=='PHOTO') {
+                                    base64Str.list.push(base64Image)    
+                              }
+                      })
+                      await Promise.all(promises)
+
                   } catch (err) {
                       base64Image   = ''
                       tipoConteudo  = 'INFO'

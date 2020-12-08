@@ -71,7 +71,15 @@ async function checkNovasEvidencias() {
                         imagemRUIM   = true
                         sendLog('AVISO:',`DOC: ${element.DOCUMENTO} - (${origem}) - Imagem corrumpida ou qualidade ruim` )
                     } else {
-                        let resposta     = await enviaEvidencias( element, evidencia.imagem )
+                        
+                        let img = evidencia.imagem
+                        if(evidencia.list) {
+                            if(evidencia.list.length>1) {
+                                img = evidencia.list
+                            }
+                        }
+
+                        let resposta     = await enviaEvidencias( element, img )
                         isErr            = resposta.isErr
                         isAxiosError     = resposta.isAxiosError || false
                         resultado        = resposta.dados.EvidenciaOcorrenciaResult

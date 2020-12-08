@@ -106,7 +106,7 @@ let enviaDados = async () => {
                     sendLog('ERRO',`Gravando retorno API em BD (ID.${ocorrencia_id}) : ${resposta}`)
 
                 } else {
-                  sendLog('INFO',`OK - (ID.${ocorrencia_id}) : ${resposta}`)
+                  sendLog('INFO',`OK - (ID.${ocorrencia_id}) : ${JSON.stringify(resposta)}`)
                   naoEnviadas--
                 }
               })
