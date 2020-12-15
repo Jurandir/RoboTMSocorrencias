@@ -1,5 +1,5 @@
 //-- Versão Inicial em ( 13/11/2020 ) 
-//-- Versão Atual   em ( 27/11/2020 ) ( PRECISA REFATORAR )
+//-- Versão Atual   em ( 08/12/2020 ) ( PRECISA REFATORAR )
 //-- By: Jurandir Ferreira
 const colors = require('colors')
 
