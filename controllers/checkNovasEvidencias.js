@@ -50,42 +50,55 @@ async function checkNovasEvidencias() {
             let isAxiosError = true
             let origem       = 'EASYDOCS'
             let imagemRUIM   = false
+            let list         = []
 
             let evidencia = await easydocs(element.DOCUMENTO)
 
             if (evidencia.ok==false){
                 // Não achou na Easydocs e vai procurar na AgileProcess
                 origem       = 'AGILEPROCESS'
-                evidencia    = await agileprocess(element.DOCUMENTO)
+                evidencia    = await agileprocess(element.DOCUMENTO)                
+                list.push(...evidencia.list)
             } 
 
             if (evidencia.ok==false){
+
                 sendLog('WARNING',`(EasyDocs,AgileProcess) DOC:${element.DOCUMENTO} - (Não achou a imagem solicitada) (006) (${origem})` )
             } 
             else if (evidencia.ok==true){
+
                 imagemRUIM   = false
                 ret.qtdeSucesso++
+
                 //-------------------
                 try {
-                    if(evidencia.imagem.length<200) {
+                    
+                    const LISTA = []
+                    LISTA.push(...list)
+
+                    if((evidencia.imagem.length<200) && (list.length=0) ){
                         imagemRUIM   = true
                         sendLog('AVISO:',`DOC: ${element.DOCUMENTO} - (${origem}) - Imagem corrumpida ou qualidade ruim` )
                     } else {
-                        
-                        let img = evidencia.imagem
-                        if(evidencia.list) {
-                            if(evidencia.list.length>1) {
-                                img = evidencia.list
-                            }
+                 
+                        let img = []
+                        if(LISTA.length > 0) {
+                            img.push( ...LISTA )
+                        } else {
+                            let tmp = [evidencia.imagem]
+                            img.push( ...tmp)
                         }
 
                         let resposta     = await enviaEvidencias( element, img )
                         isErr            = resposta.isErr
                         isAxiosError     = resposta.isAxiosError || false
                         resultado        = resposta.dados.EvidenciaOcorrenciaResult
+
+
                     }
                     gravaEvidenciasLoad_OK(element.DOCUMENTO, origem)
                 } catch (err) {
+                    console.log('ERRO - (checkNovasEvidencias) :',err)
                     isErr = true
                     sendDebug('DOC:'+element.DOCUMENTO, `(${origem}) param:`+JSON.stringify(element) )
                     sendLog('WARNING',`Envio p/API-DOC:${element.DOCUMENTO} - (002) (${origem})` )
@@ -95,7 +108,7 @@ async function checkNovasEvidencias() {
                     if ((isAxiosError==true) || (isErr==true)) { 
                         sendLog('ERRO',`Envio p/API-DOC:${element.DOCUMENTO} - (001) (${origem})` ) 
                     } else if ( resultado.Sucesso == false ) { 
-                        sendLog('WARNING',`Envio p/API-DOC: ${element.DOCUMENTO} - Ret API: ${resultado.Mensagem} - Prot: ${resultado.Protocolo} (004) (${origem})`)
+                        sendLog('WARNING',`API : Envio retornado, não OK, DOC: ${element.DOCUMENTO} - Msg: ${resultado.Mensagem} - Prot: ${resultado.Protocolo} (004) (${origem})  Chave: (${element.CHAVEORIGINAL})`)
                     } else if ( resultado.Sucesso == true ) { 
                         gravaEvidenciasSend_OK(element.DOCUMENTO, resultado.Protocolo, origem)
                         sendLog('SUCESSO',`Envio p/API-DOC: ${element.DOCUMENTO} - Ret API: ${resultado.Mensagem} - Prot: ${resultado.Protocolo} (005) (${origem})`)

@@ -1,7 +1,7 @@
 const axios = require('axios')
 require('dotenv').config();
 
-const url = process.env.EASYDOCS_SOAP_URL
+const url = process.env.EASYDOCS_SOAP_URL || 'http://batchimageintegration.easydocs.com.br/Service/wsimagens.asmx'
 
 const getImageEasydocs = async (emp,num) => {
   

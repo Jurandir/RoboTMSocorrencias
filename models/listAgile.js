@@ -2,7 +2,7 @@ const listAgile = ( documento ) => {
     return { 
             "filters": {
                 "user_service_unique_code__in": [ documento ],
-                "logically_deleted" : false
+                "logically_deleted" : true
             },
             "action": "list",
             "json_content": [{

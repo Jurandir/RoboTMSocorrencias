@@ -15,6 +15,7 @@ const checkImagemEasyDocs = async (documento) => {
             if (resposta.isErr) {
                   base64Str.msg   = resposta.err.message
                   sendLog('ERRO',`Imagem EasyDocs ${documento} : ${base64Str.msg}`)
+
             } else 
             if (resposta.Retorno==false) {
                   base64Str.msg   = 'Não tem a imagem solicitada.'
@@ -31,6 +32,7 @@ const checkImagemEasyDocs = async (documento) => {
                  
     }).catch((err)=>{ 
       base64Str.msg   = JSON.stringify(err)
+      console.log('(EasyDocs) ERRO- ',base64Str.msg)
       sendLog('ERRO',`Imagem EasyDocs ${documento} : ${ JSON.stringify(err) } - checkImagemEasyDocs`)
     })
 

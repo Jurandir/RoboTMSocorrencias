@@ -9,7 +9,7 @@ const checkImagemAgileProcess = async (documento) => {
 
     await getImageAgileProcess( value ).then( async (resposta)=>{
 
-            let msg           = 'Não tem a imagem solicitada.'
+            let msg           = ''
             let base64Image   = ''
             let tipoConteudo  = 'INFO'
 
@@ -31,15 +31,25 @@ const checkImagemAgileProcess = async (documento) => {
                      }
                  
                      const promises = resources.map(async (element, idx) => { 
+
                               base64Image   = element.content
                               tipoConteudo  = element.content_type
                               if (tipoConteudo=='PHOTO') {
-                                    base64Str.list.push(base64Image)    
+                                    msg              = 'Imagem recebida.'
+                                    base64Str.msg    = msg
+                                    base64Str.list.push(base64Image) 
+                                    base64Str.ok     = true   
+                                    sendLog('SUCESSO',`Imagem AgileProcess (LIST) ${documento} : ${base64Str.msg}`)      
+                              } else {
+                                    base64Str.msg    = msg
+                                    base64Str.ok     = false
                               }
                       })
+
                       await Promise.all(promises)
 
                   } catch (err) {
+
                       base64Image   = ''
                       tipoConteudo  = 'INFO'
                   }
@@ -49,22 +59,31 @@ const checkImagemAgileProcess = async (documento) => {
                         base64Str.msg    = msg
                         base64Str.ok     = true
                         base64Str.imagem = base64Image
-                        sendLog('SUCESSO',`Imagem AgileProcess ${documento} : ${base64Str.msg}`)      
-                  } else {
-                        base64Str.msg    = msg
-                        base64Str.ok     = false
-                        sendLog('INFO',`Não obteve imagem na API - AgileProcess ${documento} - (Rotina: checkImagemAgileProcess)`)
+                        sendLog('SUCESSO',`Imagem AgileProcess (PHOTO) ${documento} : ${base64Str.msg}`)      
                   }
 
             } else {
+
                   base64Str.msg   = msg
             }  
                  
     }).catch((err)=>{ 
+
       base64Str.msg   = JSON.stringify(err)
       console.log(err)
       sendLog('ERRO',`Obtendo Imagem - AgileProcess ${documento} : ${ JSON.stringify(err) } - (Rotina: checkImagemAgileProcess)`)
     })
+
+    if (base64Str.list.length>0) {
+      base64Str.ok  = true
+      base64Str.msg = `Lista com : ${base64Str.list.length}`
+
+      let len
+      base64Str.list.forEach((d,i)=>{
+            len = `${d}`.length
+            sendLog('INFO',`obteve ${documento} imagem${i} na API - AgileProcess LEN: ${len} - (Rotina: checkImagemAgileProcess)`)
+      })
+    }
 
     return base64Str
 
