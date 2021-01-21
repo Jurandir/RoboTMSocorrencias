@@ -33,6 +33,19 @@ async function checkNovasEvidencias() {
         }
         gravaRegistroEvidencias(params)
     }
+
+    function gravaEvidenciaCancelada( documento, protocolo , origem){
+        let params = {
+            documento: documento,
+            enviado: 1,
+            origem: origem+'*',
+            load: 1,
+            send: 1,
+            protocolo: protocolo+'.Impossível registrar nova evidência.',
+        }
+        gravaRegistroEvidencias(params)
+    }
+
     
     if (dados.erro) {
         ret.isErr = true
@@ -109,6 +122,9 @@ async function checkNovasEvidencias() {
                         sendLog('ERRO',`Envio p/API-DOC:${element.DOCUMENTO} - (001) (${origem})` ) 
                     } else if ( resultado.Sucesso == false ) { 
                         sendLog('WARNING',`API : Envio retornado, não OK, DOC: ${element.DOCUMENTO} - Msg: ${resultado.Mensagem} - Prot: ${resultado.Protocolo} (004) (${origem})  Chave: (${element.CHAVEORIGINAL})`)
+                        if(`${resultado.Mensagem}`.search('POD do CT-e') > 0 ) {
+                            gravaEvidenciaCancelada(element.DOCUMENTO, resultado.Protocolo, origem)
+                        }
                     } else if ( resultado.Sucesso == true ) { 
                         gravaEvidenciasSend_OK(element.DOCUMENTO, resultado.Protocolo, origem)
                         sendLog('SUCESSO',`Envio p/API-DOC: ${element.DOCUMENTO} - Ret API: ${resultado.Mensagem} - Prot: ${resultado.Protocolo} (005) (${origem})`)
