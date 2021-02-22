@@ -21,25 +21,45 @@ const checkImagemAgileProcess = async (documento) => {
             if (!resposta.Err) {
 
                   try {
-                     let resources = resposta.dados.json_response[0].checkpoint.resources
+                     let resources = resposta.dados.json_response[0].checkpoint.resources.slice(0).reverse()
                      let photo = resposta.dados.json_response[0].checkpoint.image
 
-                     if(photo) {
+                     if((photo) && (resources.length==0)) {
                         tipoConteudo ='PHOTO'   
                         base64Image  = JSON.parse(photo).photo
                         base64Str.list.push(base64Image)
                      }
                  
                      const promises = resources.map(async (element, idx) => { 
+     
+                             let label    = element.content_label
+                             let label_id = element.service_event_effect_id
+                             let display  = ''
+
 
                               base64Image   = element.content
                               tipoConteudo  = element.content_type
+
+                              console.log('IMAGENS:',idx,label,label_id,base64Image.length)
+
                               if (tipoConteudo=='PHOTO') {
                                     msg              = 'Imagem recebida.'
                                     base64Str.msg    = msg
                                     base64Str.list.push(base64Image) 
-                                    base64Str.ok     = true   
-                                    sendLog('SUCESSO',`Imagem AgileProcess (LIST) ${documento} : ${base64Str.msg}`)      
+                                    base64Str.ok     = true 
+                                    display = `Imagem AgileProcess [${label_id}]/(${label}) ${documento} : ${base64Str.msg}`
+                                    sendLog('SUCESSO',display)      
+
+                                    // Swap para deixar sempre a imagem SEVA na frete
+                                    let lenArray = base64Str.list
+                                    if(lenArray>1 && label_id==60){
+                                          let img1 = base64Str.list[0]
+                                          base64Str.list[0] = base64Image
+                                          base64Str.list[lenArray-1] = img1
+                                    }
+                                    
+                                    // console.log(display)
+
                               } else {
                                     base64Str.msg    = msg
                                     base64Str.ok     = false

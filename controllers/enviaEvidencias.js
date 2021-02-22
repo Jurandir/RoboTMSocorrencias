@@ -31,17 +31,21 @@ const enviaEvidencias = async ( evidencia, imagem ) => {
       }
       try { 
           
-          const promises = fotos.map(async (foto, idx) => {
-              bodyParameters.imagem = foto
+          //---------------------------------------------
+          // comentado para enviar somente 1 imagem
+          //---------------------------------------------
+          //const promises = fotos.map(async (foto, idx) => {
+          //    bodyParameters.imagem = foto
+              let idx = 0
               ret = await axios.post(url,  bodyParameters, config)
 
-              list.push(ret)
+          //    list.push(ret)
               let bp = bodyParameters
               bp.imagem = `IMAGEM: ${idx}, (STRING_IMAGEM_BASE64) LEN: ${bodyParameters.imagem.length}`
               sendDebug(evidencia.CHAVEORIGINAL, `(param:`+JSON.stringify(bp)+',config:'+JSON.stringify(config) )  
 
-          })
-          await Promise.all(promises)
+          //})
+          //await Promise.all(promises)
 
           return { dados : ret.data, list: list ,isErr: false, isAxiosError: false }
 
