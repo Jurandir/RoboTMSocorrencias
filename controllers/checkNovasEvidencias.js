@@ -72,6 +72,10 @@ async function checkNovasEvidencias() {
                 origem       = 'AGILEPROCESS'
                 evidencia    = await agileprocess(element.DOCUMENTO)                
                 list.push(...evidencia.list)
+
+                // Testar se "evidencia.cods[0] == 60", COMPROVANTE CLIENTE , se não for setar "evidencia.ok=false"
+                // msg = "AgileProcess - Não retornou comprovante cliente = 60"
+
             } 
 
             if (evidencia.ok==false){

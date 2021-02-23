@@ -3,7 +3,7 @@ const sendLog                = require('../utils/sendLog')
 
 const checkImagemAgileProcess = async (documento) => {
     let value    = documento
-    let base64Str = { ok:false, msg:'Sem retorno',imagem:'', list:[] }
+    let base64Str = { ok:false, msg:'Sem retorno',imagem:'', list:[], cods:[] }
 
     sendLog('INFO',`Solicitando imagem ${documento}, Aguardando AgileProcess...`)
 
@@ -28,6 +28,7 @@ const checkImagemAgileProcess = async (documento) => {
                         tipoConteudo ='PHOTO'   
                         base64Image  = JSON.parse(photo).photo
                         base64Str.list.push(base64Image)
+                        base64Str.cods.push(0)
                      }
                  
                      const promises = resources.map(async (element, idx) => { 
@@ -45,7 +46,8 @@ const checkImagemAgileProcess = async (documento) => {
                               if (tipoConteudo=='PHOTO') {
                                     msg              = 'Imagem recebida.'
                                     base64Str.msg    = msg
-                                    base64Str.list.push(base64Image) 
+                                    base64Str.list.push(base64Image)
+                                    base64Str.cods.push(label_id) 
                                     base64Str.ok     = true 
                                     display = `Imagem AgileProcess [${label_id}]/(${label}) ${documento} : ${base64Str.msg}`
                                     sendLog('SUCESSO',display)      
@@ -54,8 +56,13 @@ const checkImagemAgileProcess = async (documento) => {
                                     let lenArray = base64Str.list
                                     if(lenArray>1 && label_id==60){
                                           let img1 = base64Str.list[0]
+                                          let cods1 = base64Str.cods[0]
+
                                           base64Str.list[0] = base64Image
+                                          base64Str.cods[0] = label_id
+
                                           base64Str.list[lenArray-1] = img1
+                                          base64Str.cods[lenArray-1] = cods1
                                     }
                                     
                                     // console.log(display)
