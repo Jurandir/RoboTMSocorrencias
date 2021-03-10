@@ -65,7 +65,7 @@ async function checkNovasEvidencias() {
             let imagemRUIM   = false
             let list         = []
 
-            let evidencia = await easydocs(element.DOCUMENTO)
+            let evidencia = { ok: false }  //;= await easydocs(element.DOCUMENTO)
 
             if (evidencia.ok==false){
                 // Não achou na Easydocs e vai procurar na AgileProcess

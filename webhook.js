@@ -215,13 +215,15 @@ let chacaNovasOcorencias = setInterval(() => {
 
       x_getNovasOcorencias  = false
       getNovasOcorencias().then((dados)=>{
-          if (dados[0].QTDE > 0) { 
-              naoEnviadas = dados[0].QTDE
-              ShowInfo()
-            // Chama processo de envio de dados quando existe dados não enviados
-              enviaDados()
-          } else {
-            // inicio_id = 0
+          if(dados && dados.length>0) {
+            if (dados[0].QTDE > 0) { 
+                naoEnviadas = dados[0].QTDE
+                ShowInfo()
+              // Chama processo de envio de dados quando existe dados não enviados
+                enviaDados()
+            } else {
+              // inicio_id = 0
+            }
           }
           x_getNovasOcorencias  = true
       })
