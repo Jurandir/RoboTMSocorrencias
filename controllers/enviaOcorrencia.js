@@ -20,7 +20,7 @@ const enviaOcorrencia = async ( ocorrencia, cliente ) => {
         "chave": selectChaveValidaCliente( ocorrencia.CHAVEORIGINAL ),
         "ocorrCasual": ocorrencia.OCORRCASUAL,
         "ocorrTransporte": ocorrencia.OCORRTRANSPORTE,
-        "dataOcorr": formataDataBD( ocorrencia.DT_ATUAL ),
+        "dataOcorr": formataDataBD( ocorrencia.DT_OCORRENCIA ),
         "replicar": ocorrencia.REPLICAR,
         "latitude": ocorrencia.LATITUDE,
         "longitude": ocorrencia.LONGITUDE,
